@@ -1,0 +1,20 @@
+[workspace]
+name = "llmaven-rse-sandbox"
+version = "0.1.0"
+description = "NAIRR RSE sandbox environment"
+authors = ["UW SSEC Team"]
+requires-pixi = ">=0.63.2"
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-arm64"]
+
+[dependencies]
+python = "3.11.*"
+numpy = "*"
+pandas = "*"
+matplotlib = "*"
+xarray = "*"
+netcdf4 = "*"
+requests = "*"
+
+[tasks]
+gateway-check = "python check_llmaven_gateway.py"
