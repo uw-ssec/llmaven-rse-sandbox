@@ -11,8 +11,7 @@
         "GitHub.copilot-chat",
         "johnny-zhao.oai-compatible-copilot",
         "ms-python.python",
-        "ms-python.vscode-pylance",
-        "jjjermiah.pixi-vscode"
+        "ms-python.vscode-pylance"
       ],
       "settings": {
         "workbench.startupEditor": "readme",

@@ -33,6 +33,12 @@ To verify the gateway connection, run:
 pixi run gateway-check
 ```
 
+If you need troubleshooting output, run:
+
+```bash
+pixi run gateway-check --debug
+```
+
 ## Running sample scripts
 
 This sandbox uses pixi for environment management. Run sample scripts through pixi:
@@ -55,6 +61,10 @@ When a codespace is created, GitHub can prompt for any recommended secrets that 
 ### How this evolves later
 
 As onboarding/provisioning becomes more complete, the goal is to preserve the same runtime contract (LITELLM_GATEWAY_URL and LITELLM_API_KEY) while reducing manual setup for users. The sandbox should continue reading the same environment variables even if the delivery mechanism becomes more automated later.
+
+### Extension trust model
+
+This sandbox installs a minimal extension set. One third-party extension is currently required for OpenAI-compatible routing and should be treated as a deliberate trust assumption for the demo.
 
 ## Notes
 

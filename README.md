@@ -28,3 +28,5 @@ Demo users should fork this repository to save work. See `docs/save-your-work.md
 ## Notes
 
 AI interactions in this environment may be routed through the LLMaven gateway for research and evaluation purposes. See `docs/data-collection.md`.
+
+This sandbox auto-installs a minimal extension set. One third-party extension is currently required for OpenAI-compatible routing and should be treated as a deliberate trust assumption for the demo.
