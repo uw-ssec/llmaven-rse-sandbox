@@ -1,0 +1,40 @@
+{
+  "name": "LLMaven RSE Sandbox",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "johnny-zhao.oai-compatible-copilot",
+        "ms-python.python",
+        "ms-python.vscode-pylance"
+      ],
+      "settings": {
+        "workbench.startupEditor": "readme",
+        "files.watcherExclude": {
+          "**/.git/objects/**": true,
+          "**/.git/subtree-cache/**": true,
+          "**/node_modules/*/**": true
+        }
+      }
+    }
+  },
+  "secrets": {
+    "LITELLM_GATEWAY_URL": {
+      "description": "Base URL for the LLMaven / LiteLLM gateway"
+    },
+    "LITELLM_API_KEY": {
+      "description": "API key for the LLMaven / LiteLLM gateway"
+    }
+  },
+  "mounts": [
+    "source=${localWorkspaceFolderBasename}-pixi,target=${containerWorkspaceFolder}/.pixi,type=volume"
+  ],
+  "onCreateCommand": "bash .devcontainer/on-create.sh",
+  "postStartCommand": "bash .devcontainer/post-start.sh",
+  "remoteUser": "vscode"
+}
