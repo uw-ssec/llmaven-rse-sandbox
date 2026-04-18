@@ -3,6 +3,7 @@ set -euo pipefail
 
 SESSION_DIR="${XDG_RUNTIME_DIR:-$HOME/.cache/llmaven}"
 SESSION_FILE="${SESSION_DIR}/session_id"
+VSIX_PATH="${HOME}/.cache/oai-compatible-copilot/oai-compatible-copilot-sandbox.vsix"
 
 mkdir -p "$SESSION_DIR"
 chmod 700 "$SESSION_DIR"
@@ -33,4 +34,40 @@ fi
 LLMAVEN_API_KEY_ENV_NAME="LITELLM_API_KEY"
 if [ -z "${!LLMAVEN_API_KEY_ENV_NAME:-}" ]; then
   echo "Warning: $LLMAVEN_API_KEY_ENV_NAME is not set."
+fi
+
+OAI_API_KEY_ENV_NAME="OAI_API_KEY"
+if [ -z "${!OAI_API_KEY_ENV_NAME:-}" ]; then
+  echo "Warning: $OAI_API_KEY_ENV_NAME is not set."
+fi
+
+echo ""
+echo "[post-start] VSIX artifact status:"
+if [ -f "${VSIX_PATH}" ]; then
+  echo "[post-start] VSIX present: ${VSIX_PATH}"
+else
+  echo "[post-start] Warning: VSIX not found at ${VSIX_PATH}"
+fi
+
+if [ -n "${LITELLM_BASE_URL:-}" ]; then
+  echo "[post-start] Base URL: configured"
+fi
+
+if [ -n "${LITELLM_API_KEY:-}" ]; then
+  echo "[post-start] LiteLLM API key: detected"
+fi
+
+if [ -n "${OAI_API_KEY:-}" ]; then
+  echo "[post-start] OAI API key alias: detected"
+fi
+
+if [ -n "${LITELLM_BASE_URL:-}" ] && [ -n "${LITELLM_API_KEY:-}" ]; then
+  echo "[post-start] Running gateway smoke test via pixi run gateway-check"
+  if command -v pixi >/dev/null 2>&1; then
+    if ! pixi run gateway-check; then
+      echo "[post-start] Warning: gateway-check failed"
+    fi
+  else
+    echo "[post-start] Warning: pixi not found; skipping gateway-check"
+  fi
 fi
