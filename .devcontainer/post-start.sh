@@ -34,3 +34,38 @@ LLMAVEN_API_KEY_ENV_NAME="LITELLM_API_KEY"
 if [ -z "${!LLMAVEN_API_KEY_ENV_NAME:-}" ]; then
   echo "Warning: $LLMAVEN_API_KEY_ENV_NAME is not set."
 fi
+
+VSIX_PATH="${HOME}/.cache/oai-compatible-copilot/oai-compatible-copilot-sandbox.vsix"
+
+echo ""
+echo "[post-start] Extension inventory (copilot/oai/compatible):"
+if command -v code >/dev/null 2>&1; then
+  code --list-extensions | grep -Ei "copilot|oai|compatible" || true
+else
+  echo "[post-start] 'code' CLI not found; skipping extension listing."
+fi
+
+if [ -f "${VSIX_PATH}" ]; then
+  echo "[post-start] VSIX present: ${VSIX_PATH}"
+else
+  echo "[post-start] Warning: VSIX not found at ${VSIX_PATH}"
+fi
+
+if [ -n "${LITELLM_BASE_URL:-}" ]; then
+  echo "[post-start] Base URL: ${LITELLM_BASE_URL}"
+fi
+
+if [ -n "${LITELLM_API_KEY:-}" ]; then
+  echo "[post-start] API key: detected"
+fi
+
+if [ -n "${LITELLM_BASE_URL:-}" ] && [ -n "${LITELLM_API_KEY:-}" ]; then
+  echo "[post-start] Running gateway smoke test via pixi run gateway-check"
+  if command -v pixi >/dev/null 2>&1; then
+    if ! pixi run gateway-check; then
+      echo "[post-start] Warning: gateway-check failed"
+    fi
+  else
+    echo "[post-start] Warning: pixi not found; skipping gateway-check"
+  fi
+fi

@@ -85,11 +85,15 @@ def main() -> None:
 
     url = f"{base_url}/v1/models"
 
-    resp = requests.get(
-        url,
-        headers={"Authorization": f"Bearer {api_key}"},
-        timeout=20,
-    )
+    try:
+        resp = requests.get(
+            url,
+            headers={"Authorization": f"Bearer {api_key}"},
+            timeout=20,
+        )
+    except requests.RequestException as err:
+        print(f"Request failed: {err}")
+        sys.exit(1)
 
     print(f"GET {url} -> {resp.status_code}")
 
@@ -118,7 +122,16 @@ def main() -> None:
         print(resp.text[:1000])
         print("--- raw-body-preview-end ---")
 
-    resp.raise_for_status()
+    try:
+        resp.raise_for_status()
+    except requests.HTTPError:
+        if isinstance(payload, dict):
+            msg = payload.get("error") or payload.get("message")
+            if msg:
+                print(f"Gateway error detail: {msg}")
+
+        print("Gateway connectivity check failed.")
+        sys.exit(1)
 
     if isinstance(payload, dict) and isinstance(payload.get("data"), list):
         print(f"Models returned: {len(payload['data'])}")

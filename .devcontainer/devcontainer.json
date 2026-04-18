@@ -9,7 +9,6 @@
       "extensions": [
         "GitHub.copilot",
         "GitHub.copilot-chat",
-        "johnny-zhao.oai-compatible-copilot",
         "ms-python.python",
         "ms-python.vscode-pylance"
       ],
@@ -34,7 +33,15 @@
   "mounts": [
     "source=${localWorkspaceFolderBasename}-pixi,target=${containerWorkspaceFolder}/.pixi,type=volume"
   ],
+  "remoteEnv": {
+    "LITELLM_GATEWAY_URL": "${localEnv:LITELLM_GATEWAY_URL}",
+    "LITELLM_API_KEY": "${localEnv:LITELLM_API_KEY}",
+    "RSE_EXTENSION_REPO": "https://github.com/uw-ssec/oai-compatible-copilot.git",
+    "RSE_EXTENSION_BRANCH": "sandbox",
+    "RSE_EXTENSION_REF": ""
+  },
   "onCreateCommand": "bash .devcontainer/on-create.sh",
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
   "postStartCommand": "bash .devcontainer/post-start.sh",
   "remoteUser": "vscode"
 }
