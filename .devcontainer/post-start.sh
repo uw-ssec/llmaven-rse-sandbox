@@ -9,15 +9,12 @@ chmod 700 "$SESSION_DIR"
 
 if [ ! -f "$SESSION_FILE" ]; then
   TMP_SESSION_FILE="$(mktemp "${SESSION_DIR}/session_id.XXXXXX")"
-  # Clean up temp file if the script exits abnormally before moving it to final location
   trap 'rm -f "$TMP_SESSION_FILE"' EXIT
-  python - <<'PY' > "$TMP_SESSION_FILE"
-import uuid
-print(uuid.uuid4())
-PY
+
+  cat /proc/sys/kernel/random/uuid > "$TMP_SESSION_FILE"
+
   chmod 600 "$TMP_SESSION_FILE"
   mv "$TMP_SESSION_FILE" "$SESSION_FILE"
-  # Disable trap after successful move
   trap - EXIT
 fi
 

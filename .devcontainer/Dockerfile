@@ -14,6 +14,8 @@ RUN apt-get update && apt-get install -y \
     tar \
     && rm -rf /var/lib/apt/lists/*
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 # Install pixi by verifying against reviewed, pinned SHA256 values in this Dockerfile.
 RUN set -euo pipefail \
     && ARCH="$(uname -m)" \
