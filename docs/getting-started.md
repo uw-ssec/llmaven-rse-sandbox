@@ -51,7 +51,7 @@ pixi run python samples/model_visualization.py
 
 ## How credentials are provided
 
-This repository declares the names of the required runtime secrets in devcontainer.json (LITELLM_GATEWAY_URL and LITELLM_API_KEY).
+This repository declares the names of the required runtime secrets in devcontainer.json (LITELLM_BASE_URL and LITELLM_API_KEY).
 
 ### Current implementation
 The actual secret values are not stored in the repository. They are provided through GitHub Codespaces development environment secrets (user-level, repository-level, or organization-level).
@@ -60,7 +60,7 @@ When a codespace is created, GitHub can prompt for any recommended secrets that 
 
 ### How this evolves later
 
-As onboarding/provisioning becomes more complete, the goal is to preserve the same runtime contract (LITELLM_GATEWAY_URL and LITELLM_API_KEY) while reducing manual setup for users. The sandbox should continue reading the same environment variables even if the delivery mechanism becomes more automated later.
+As onboarding/provisioning becomes more complete, the goal is to preserve the same runtime contract (LITELLM_BASE_URL and LITELLM_API_KEY) while reducing manual setup for users. The sandbox should continue reading the same environment variables even if the delivery mechanism becomes more automated later.
 
 ### Extension trust model
 

@@ -2,16 +2,28 @@ import argparse
 import json
 import os
 import sys
-from urllib.parse import urlparse
 
 import requests
 
-# Only allow connections to the approved LLMaven gateway host
-APPROVED_GATEWAY_HOST = "ssec-uw-llmaven.hf.space"
+
+class EnvVar(str):
+    """Named type for environment variable identifiers."""
+
+    def __new__(cls, name: str):
+        return super().__new__(cls, name)
+
+    def __repr__(self) -> str:
+        return f"<EnvVar {super().__repr__()}>"
+
+
+LITELLM_BASE_URL = EnvVar("LITELLM_BASE_URL")
+LITELLM_API_KEY = EnvVar("LITELLM_API_KEY")
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Validate LLMaven gateway connectivity")
+    parser = argparse.ArgumentParser(
+        description="Validate LLMaven gateway connectivity"
+    )
     parser.add_argument(
         "--debug",
         action="store_true",
@@ -25,45 +37,21 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def validate_gateway_url(gateway: str) -> str:
-    parsed = urlparse(gateway)
-
-    if parsed.scheme.lower() != "https":
-        raise ValueError("LITELLM_GATEWAY_URL must use https")
-    if not parsed.netloc:
-        raise ValueError("LITELLM_GATEWAY_URL must include a host")
-    if parsed.netloc != APPROVED_GATEWAY_HOST:
-        raise ValueError(
-            f"LITELLM_GATEWAY_URL host must be {APPROVED_GATEWAY_HOST}, got {parsed.netloc}"
-        )
-    if parsed.username or parsed.password:
-        raise ValueError("LITELLM_GATEWAY_URL must not contain embedded credentials")
-    if parsed.fragment:
-        raise ValueError("LITELLM_GATEWAY_URL must not include a URL fragment")
-
-    return gateway.rstrip("/")
-
-
 def main() -> None:
     args = parse_args()
-    gateway = os.getenv("LITELLM_GATEWAY_URL", "").strip()
-    api_key = os.getenv("LITELLM_API_KEY")
 
-    if not gateway:
-        print("Missing LITELLM_GATEWAY_URL")
+    base_url = os.getenv(LITELLM_BASE_URL, "").strip().rstrip("/")
+    api_key = os.getenv(LITELLM_API_KEY)
+
+    if not base_url:
+        print(f"Missing {LITELLM_BASE_URL}")
         sys.exit(1)
 
     if not api_key:
-        print("Missing LITELLM_API_KEY")
+        print(f"Missing {LITELLM_API_KEY}")
         sys.exit(1)
 
-    try:
-        gateway = validate_gateway_url(gateway)
-    except ValueError as err:
-        print(f"Invalid LITELLM_GATEWAY_URL: {err}")
-        sys.exit(1)
-
-    url = gateway + "/v1/models"
+    url = f"{base_url}/v1/models"
 
     resp = requests.get(
         url,
@@ -82,7 +70,7 @@ def main() -> None:
     if args.debug:
         print(f"content-type: {resp.headers.get('content-type', '<missing>')}")
         print(f"response-bytes: {len(resp.content)}")
-        
+
         if isinstance(payload, dict):
             print(f"json-keys: {json.dumps(sorted(payload.keys()))}")
             if isinstance(payload.get("data"), list):

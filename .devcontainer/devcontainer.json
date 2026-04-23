@@ -24,7 +24,7 @@
     }
   },
   "secrets": {
-    "LITELLM_GATEWAY_URL": {
+    "LITELLM_BASE_URL": {
       "description": "Base URL for the LLMaven / LiteLLM gateway"
     },
     "LITELLM_API_KEY": {

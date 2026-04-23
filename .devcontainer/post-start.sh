@@ -25,10 +25,12 @@ SHORT_SESSION_ID="${SESSION_ID%%-*}"
 echo ""
 echo "LLMaven session initialized: ${SHORT_SESSION_ID}..."
 
-if [ -z "${LITELLM_GATEWAY_URL:-}" ]; then
-  echo "Warning: LITELLM_GATEWAY_URL is not set."
+LLMAVEN_BASE_URL_ENV_NAME="LITELLM_BASE_URL"
+if [ -z "${!LLMAVEN_BASE_URL_ENV_NAME:-}" ]; then
+  echo "Warning: $LLMAVEN_BASE_URL_ENV_NAME is not set."
 fi
 
-if [ -z "${LITELLM_API_KEY:-}" ]; then
-  echo "Warning: LITELLM_API_KEY is not set."
+LLMAVEN_API_KEY_ENV_NAME="LITELLM_API_KEY"
+if [ -z "${!LLMAVEN_API_KEY_ENV_NAME:-}" ]; then
+  echo "Warning: $LLMAVEN_API_KEY_ENV_NAME is not set."
 fi
