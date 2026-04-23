@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import sys
+from urllib.parse import urlparse
 
 import requests
 
@@ -37,10 +38,35 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def validate_base_url(base_url: str) -> str:
+    """
+    Perform minimal sanity checks on the base URL before using it.
+
+    This intentionally avoids host allowlists and only enforces structural safety.
+    """
+    parsed = urlparse(base_url)
+
+    if parsed.scheme.lower() != "https":
+        raise ValueError(f"{LITELLM_BASE_URL} must use https")
+
+    if not parsed.netloc:
+        raise ValueError(f"{LITELLM_BASE_URL} must include a host")
+
+    if parsed.username or parsed.password:
+        raise ValueError(
+            f"{LITELLM_BASE_URL} must not contain embedded credentials"
+        )
+
+    if parsed.fragment:
+        raise ValueError(f"{LITELLM_BASE_URL} must not include a URL fragment")
+
+    return base_url.rstrip("/")
+
+
 def main() -> None:
     args = parse_args()
 
-    base_url = os.getenv(LITELLM_BASE_URL, "").strip().rstrip("/")
+    base_url = os.getenv(LITELLM_BASE_URL, "").strip()
     api_key = os.getenv(LITELLM_API_KEY)
 
     if not base_url:
@@ -49,6 +75,12 @@ def main() -> None:
 
     if not api_key:
         print(f"Missing {LITELLM_API_KEY}")
+        sys.exit(1)
+
+    try:
+        base_url = validate_base_url(base_url)
+    except ValueError as err:
+        print(f"Invalid {LITELLM_BASE_URL}: {err}")
         sys.exit(1)
 
     url = f"{base_url}/v1/models"
