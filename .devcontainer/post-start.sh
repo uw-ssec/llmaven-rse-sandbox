@@ -35,6 +35,11 @@ if [ -z "${!LLMAVEN_API_KEY_ENV_NAME:-}" ]; then
   echo "Warning: $LLMAVEN_API_KEY_ENV_NAME is not set."
 fi
 
+OAI_API_KEY_ENV_NAME="OAI_API_KEY"
+if [ -z "${!OAI_API_KEY_ENV_NAME:-}" ]; then
+  echo "Warning: $OAI_API_KEY_ENV_NAME is not set."
+fi
+
 VSIX_PATH="${HOME}/.cache/oai-compatible-copilot/oai-compatible-copilot-sandbox.vsix"
 
 echo ""
@@ -56,7 +61,11 @@ if [ -n "${LITELLM_BASE_URL:-}" ]; then
 fi
 
 if [ -n "${LITELLM_API_KEY:-}" ]; then
-  echo "[post-start] API key: detected"
+  echo "[post-start] LiteLLM API key: detected"
+fi
+
+if [ -n "${OAI_API_KEY:-}" ]; then
+  echo "[post-start] OAI API key alias: detected"
 fi
 
 if [ -n "${LITELLM_BASE_URL:-}" ] && [ -n "${LITELLM_API_KEY:-}" ]; then

@@ -125,7 +125,7 @@ def main() -> None:
     try:
         resp.raise_for_status()
     except requests.HTTPError:
-        if isinstance(payload, dict):
+        if args.debug and isinstance(payload, dict):
             msg = payload.get("error") or payload.get("message")
             if msg:
                 print(f"Gateway error detail: {msg}")

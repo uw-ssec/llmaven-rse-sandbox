@@ -34,11 +34,12 @@
     "source=${localWorkspaceFolderBasename}-pixi,target=${containerWorkspaceFolder}/.pixi,type=volume"
   ],
   "remoteEnv": {
-    "LITELLM_GATEWAY_URL": "${localEnv:LITELLM_GATEWAY_URL}",
+    "LITELLM_BASE_URL": "${localEnv:LITELLM_BASE_URL}",
     "LITELLM_API_KEY": "${localEnv:LITELLM_API_KEY}",
-    "RSE_EXTENSION_REPO": "https://github.com/uw-ssec/oai-compatible-copilot.git",
-    "RSE_EXTENSION_BRANCH": "sandbox",
-    "RSE_EXTENSION_REF": ""
+    // NOTE: OAI_API_KEY is aliased from LITELLM_API_KEY for Copilot compatibility.
+    // This value is available to all container processes including extensions.
+    "OAI_API_KEY": "${localEnv:LITELLM_API_KEY}",
+    "RSE_EXTENSION_REF": "0a6f01e8213985d075223a99be67824ac0e1ced8"
   },
   "onCreateCommand": "bash .devcontainer/on-create.sh",
   "postCreateCommand": "bash .devcontainer/post-create.sh",
