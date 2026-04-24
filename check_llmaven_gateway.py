@@ -20,6 +20,8 @@ class EnvVar(str):
 LITELLM_BASE_URL = EnvVar("LITELLM_BASE_URL")
 LITELLM_API_KEY = EnvVar("LITELLM_API_KEY")
 
+TRUSTED_GATEWAY_HOSTS = {"ssec-uw-llmaven.hf.space"}
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -40,17 +42,23 @@ def parse_args() -> argparse.Namespace:
 
 def validate_base_url(base_url: str) -> str:
     """
-    Perform minimal sanity checks on the base URL before using it.
+    Validate the base URL before sending credentials.
 
-    This intentionally avoids host allowlists and only enforces structural safety.
+    This check requires HTTPS, blocks embedded credentials/fragments, and
+    only allows trusted LLMaven gateway hosts.
     """
     parsed = urlparse(base_url)
 
     if parsed.scheme.lower() != "https":
         raise ValueError(f"{LITELLM_BASE_URL} must use https")
 
-    if not parsed.netloc:
+    if not parsed.hostname:
         raise ValueError(f"{LITELLM_BASE_URL} must include a host")
+
+    if parsed.hostname not in TRUSTED_GATEWAY_HOSTS:
+        raise ValueError(
+            f"{LITELLM_BASE_URL} host is not trusted: {parsed.hostname}"
+        )
 
     if parsed.username or parsed.password:
         raise ValueError(
@@ -104,6 +112,7 @@ def main() -> None:
         payload = None
 
     if args.debug:
+        print(f"gateway-host: {urlparse(base_url).hostname}")
         print(f"content-type: {resp.headers.get('content-type', '<missing>')}")
         print(f"response-bytes: {len(resp.content)}")
 
