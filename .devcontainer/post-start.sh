@@ -57,7 +57,7 @@ else
 fi
 
 if [ -n "${LITELLM_BASE_URL:-}" ]; then
-  echo "[post-start] Base URL: ${LITELLM_BASE_URL}"
+  echo "[post-start] Base URL: configured"
 fi
 
 if [ -n "${LITELLM_API_KEY:-}" ]; then
