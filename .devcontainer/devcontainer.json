@@ -9,16 +9,18 @@
       "extensions": [
         "GitHub.copilot",
         "GitHub.copilot-chat",
-        "johnny-zhao.oai-compatible-copilot",
         "ms-python.python",
         "ms-python.vscode-pylance"
       ],
       "settings": {
+        "chat.plugins.enabled": true,
+        "oaicopilot.baseUrl": "https://uw-ssec-llmaven.hf.space",
         "workbench.startupEditor": "readme",
         "files.watcherExclude": {
           "**/.git/objects/**": true,
           "**/.git/subtree-cache/**": true,
-          "**/node_modules/*/**": true
+          "**/node_modules/**": true,
+          "**/.pixi/**": true
         }
       }
     }
@@ -34,7 +36,15 @@
   "mounts": [
     "source=${localWorkspaceFolderBasename}-pixi,target=${containerWorkspaceFolder}/.pixi,type=volume"
   ],
+  "remoteEnv": {
+    // OAI_API_KEY is placed in remoteEnv because the LLMaven Copilot extension runtime reads
+    // that OpenAI-compatible environment variable at activation time. Setting it only around
+    // lifecycle shell commands would not propagate to the VS Code extension host.
+    "OAI_API_KEY": "${localEnv:LITELLM_API_KEY}"
+  },
   "onCreateCommand": "bash .devcontainer/on-create.sh",
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
   "postStartCommand": "bash .devcontainer/post-start.sh",
+  "postAttachCommand": "bash .devcontainer/install-vsix.sh",
   "remoteUser": "vscode"
 }
