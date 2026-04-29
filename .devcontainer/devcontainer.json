@@ -18,6 +18,7 @@
         "files.watcherExclude": {
           "**/.git/objects/**": true,
           "**/.git/subtree-cache/**": true,
+          "**/node_modules/**": true,
           "**/.pixi/**": true
         }
       }
@@ -35,8 +36,6 @@
     "source=${localWorkspaceFolderBasename}-pixi,target=${containerWorkspaceFolder}/.pixi,type=volume"
   ],
   "remoteEnv": {
-    "LITELLM_BASE_URL": "${localEnv:LITELLM_BASE_URL}",
-    "LITELLM_API_KEY": "${localEnv:LITELLM_API_KEY}",
     // OAI_API_KEY is placed in remoteEnv because the LLMaven Copilot extension runtime reads
     // that OpenAI-compatible environment variable at activation time. Setting it only around
     // lifecycle shell commands would not propagate to the VS Code extension host.

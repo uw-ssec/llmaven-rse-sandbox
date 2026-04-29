@@ -2,14 +2,14 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+PIN_FILE="${SCRIPT_DIR}/oai-compatible-copilot-vsix.env"
 
-# shellcheck source=/dev/null
-source "${SCRIPT_DIR}/oai-compatible-copilot-vsix.env"
-
-VSIX_URL="https://github.com/uw-ssec/oai-compatible-copilot/releases/download/${VSIX_RELEASE_TAG}/${VSIX_FILENAME}"
+VSIX_RELEASE_TAG=""
+VSIX_FILENAME=""
+VSIX_SOURCE_COMMIT=""
+EXPECTED_VSIX_SHA256=""
 
 VSIX_DIR="${HOME}/.cache/oai-compatible-copilot"
-VSIX_PATH="${VSIX_DIR}/${VSIX_FILENAME}"
 
 log() {
   echo "[post-create] $*"
@@ -24,6 +24,53 @@ require_cmd() {
     error "required command not found: $1"
     return 1
   fi
+}
+
+load_pin_file() {
+  local line
+  local key
+  local value
+
+  if [ ! -f "${PIN_FILE}" ]; then
+    error "VSIX pin file not found: ${PIN_FILE}"
+    return 1
+  fi
+
+  while IFS= read -r line || [ -n "${line}" ]; do
+    case "${line}" in
+      ""|"#"*) continue ;;
+    esac
+
+    case "${line}" in
+      *=*) ;;
+      *)
+        error "invalid line in VSIX pin file: ${line}"
+        return 1
+        ;;
+    esac
+
+    key="${line%%=*}"
+    value="${line#*=}"
+
+    case "${key}" in
+      VSIX_RELEASE_TAG)
+        VSIX_RELEASE_TAG="${value}"
+        ;;
+      VSIX_FILENAME)
+        VSIX_FILENAME="${value}"
+        ;;
+      VSIX_SOURCE_COMMIT)
+        VSIX_SOURCE_COMMIT="${value}"
+        ;;
+      EXPECTED_VSIX_SHA256)
+        EXPECTED_VSIX_SHA256="${value}"
+        ;;
+      *)
+        error "unexpected key in VSIX pin file: ${key}"
+        return 1
+        ;;
+    esac
+  done < "${PIN_FILE}"
 }
 
 verify_required_vars() {
@@ -48,9 +95,50 @@ verify_required_vars() {
   fi
 
   if ! printf '%s' "${EXPECTED_VSIX_SHA256}" | grep -Eq '^[a-fA-F0-9]{64}$'; then
-    error "EXPECTED_VSIX_SHA256 must be a 64-character hex SHA256"
+    error "EXPECTED_VSIX_SHA256 must be a raw 64-character hex SHA256"
     return 1
   fi
+
+  if ! printf '%s' "${VSIX_RELEASE_TAG}" | grep -Eq '^[A-Za-z0-9._-]+$'; then
+    error "VSIX_RELEASE_TAG must contain only letters, numbers, dots, underscores, and hyphens"
+    return 1
+  fi
+
+  if ! printf '%s' "${VSIX_FILENAME}" | grep -Eq '^[A-Za-z0-9._-]+\.vsix$'; then
+    error "VSIX_FILENAME must be a safe .vsix basename"
+    return 1
+  fi
+
+  case "${VSIX_FILENAME}" in
+    *..*|*/*)
+      error "VSIX_FILENAME must not contain path traversal or slashes"
+      return 1
+      ;;
+  esac
+
+  if [ -n "${VSIX_SOURCE_COMMIT:-}" ] &&
+     ! printf '%s' "${VSIX_SOURCE_COMMIT}" | grep -Eq '^[a-fA-F0-9]{7,40}$'; then
+    error "VSIX_SOURCE_COMMIT must be a short or full hex commit SHA"
+    return 1
+  fi
+}
+
+verify_vsix_path() {
+  local vsix_dir_real
+  local vsix_path_real
+
+  vsix_dir_real="$(realpath -m "${VSIX_DIR}")"
+  vsix_path_real="$(realpath -m "${VSIX_PATH}")"
+
+  case "${vsix_path_real}" in
+    "${vsix_dir_real}"/*) ;;
+    *)
+      error "resolved VSIX path is outside VSIX cache directory"
+      error "VSIX_DIR:  ${vsix_dir_real}"
+      error "VSIX_PATH: ${vsix_path_real}"
+      return 1
+      ;;
+  esac
 }
 
 verify_sha256() {
@@ -69,14 +157,20 @@ verify_sha256() {
 main_download() {
   log "Preparing prebuilt OAI-compatible Copilot VSIX..."
 
-  verify_required_vars || return 1
-
   require_cmd curl || return 1
   require_cmd grep || return 1
+  require_cmd realpath || return 1
   require_cmd sha256sum || return 1
   require_cmd awk || return 1
 
+  load_pin_file || return 1
+  verify_required_vars || return 1
+
+  VSIX_PATH="${VSIX_DIR}/${VSIX_FILENAME}"
+  VSIX_URL="https://github.com/uw-ssec/oai-compatible-copilot/releases/download/${VSIX_RELEASE_TAG}/${VSIX_FILENAME}"
+
   mkdir -p "${VSIX_DIR}"
+  verify_vsix_path || return 1
 
   log "Release tag: ${VSIX_RELEASE_TAG}"
   if [ -n "${VSIX_SOURCE_COMMIT:-}" ]; then

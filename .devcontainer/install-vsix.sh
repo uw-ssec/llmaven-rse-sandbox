@@ -2,12 +2,12 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+PIN_FILE="${SCRIPT_DIR}/oai-compatible-copilot-vsix.env"
 
-# shellcheck source=/dev/null
-source "${SCRIPT_DIR}/oai-compatible-copilot-vsix.env"
+VSIX_FILENAME=""
+EXPECTED_VSIX_SHA256=""
 
 VSIX_DIR="${HOME}/.cache/oai-compatible-copilot"
-VSIX_PATH="${VSIX_DIR}/${VSIX_FILENAME}"
 EXTENSION_ID="uw-ssec.oai-compatible-copilot"
 
 log() {
@@ -23,6 +23,54 @@ require_cmd() {
     error "required command not found: $1"
     return 1
   fi
+}
+
+load_pin_file() {
+  local line
+  local key
+  local value
+
+  if [ ! -f "${PIN_FILE}" ]; then
+    error "VSIX pin file not found: ${PIN_FILE}"
+    return 1
+  fi
+
+  while IFS= read -r line || [ -n "${line}" ]; do
+    case "${line}" in
+      ""|"#"*) continue ;;
+    esac
+
+    case "${line}" in
+      *=*) ;;
+      *)
+        error "invalid line in VSIX pin file: ${line}"
+        return 1
+        ;;
+    esac
+
+    key="${line%%=*}"
+    value="${line#*=}"
+
+    case "${key}" in
+      VSIX_RELEASE_TAG)
+        # Not needed during install, but allowed because the same pin file
+        # is shared with post-create.sh.
+        ;;
+      VSIX_FILENAME)
+        VSIX_FILENAME="${value}"
+        ;;
+      VSIX_SOURCE_COMMIT)
+        # Human-readable metadata only. Not needed during install.
+        ;;
+      EXPECTED_VSIX_SHA256)
+        EXPECTED_VSIX_SHA256="${value}"
+        ;;
+      *)
+        error "unexpected key in VSIX pin file: ${key}"
+        return 1
+        ;;
+    esac
+  done < "${PIN_FILE}"
 }
 
 verify_required_vars() {
@@ -42,9 +90,39 @@ verify_required_vars() {
   fi
 
   if ! printf '%s' "${EXPECTED_VSIX_SHA256}" | grep -Eq '^[a-fA-F0-9]{64}$'; then
-    error "EXPECTED_VSIX_SHA256 must be a 64-character hex SHA256"
+    error "EXPECTED_VSIX_SHA256 must be a raw 64-character hex SHA256"
     return 1
   fi
+
+  if ! printf '%s' "${VSIX_FILENAME}" | grep -Eq '^[A-Za-z0-9._-]+\.vsix$'; then
+    error "VSIX_FILENAME must be a safe .vsix basename"
+    return 1
+  fi
+
+  case "${VSIX_FILENAME}" in
+    *..*|*/*)
+      error "VSIX_FILENAME must not contain path traversal or slashes"
+      return 1
+      ;;
+  esac
+}
+
+verify_vsix_path() {
+  local vsix_dir_real
+  local vsix_path_real
+
+  vsix_dir_real="$(realpath -m "${VSIX_DIR}")"
+  vsix_path_real="$(realpath -m "${VSIX_PATH}")"
+
+  case "${vsix_path_real}" in
+    "${vsix_dir_real}"/*) ;;
+    *)
+      error "resolved VSIX path is outside VSIX cache directory"
+      error "VSIX_DIR:  ${vsix_dir_real}"
+      error "VSIX_PATH: ${vsix_path_real}"
+      return 1
+      ;;
+  esac
 }
 
 verify_sha256() {
@@ -63,12 +141,17 @@ verify_sha256() {
 main_install() {
   log "Checking OAI-compatible Copilot extension..."
 
-  verify_required_vars || return 1
-
   require_cmd code || return 1
   require_cmd grep || return 1
+  require_cmd realpath || return 1
   require_cmd sha256sum || return 1
   require_cmd awk || return 1
+
+  load_pin_file || return 1
+  verify_required_vars || return 1
+
+  VSIX_PATH="${VSIX_DIR}/${VSIX_FILENAME}"
+  verify_vsix_path || return 1
 
   if [ ! -f "${VSIX_PATH}" ]; then
     error "VSIX not found at ${VSIX_PATH}"
