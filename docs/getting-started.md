@@ -1,71 +1,194 @@
-# Getting Started
+# Getting started
 
-Welcome to the LLMaven RSE Sandbox.
+This guide walks through the first-run setup for the NAIRR RSE Plugins Demo sandbox.
 
-## Goal
+The sandbox runs in GitHub Codespaces and provides a configured environment for using GitHub Copilot Chat with the LLMaven / LiteLLM gateway and the UW SSEC RSE Agent Plugins.
 
-This sandbox is a preconfigured Codespaces environment for trying GitHub Copilot and RSE-oriented plugin-assisted workflows on simple scientific code.
+## 1. Open the Codespace
 
-## First steps
+Start from the authorized onboarding flow or the repository page, then open a GitHub Codespace for this repository.
 
-1. Open `samples/climate_model.py`
-2. Ask Copilot to explain what the script does
-3. Ask for a refactor that improves readability
-4. Open `samples/climate_data_analysis.py`
-5. Ask for a small analysis improvement
-6. Open `samples/model_visualization.py`
-7. Ask for a plotting enhancement
+During setup, the devcontainer will:
 
-## What to pay attention to
+- prepare the Pixi environment
+- create a local LLMaven session identifier
+- download the pinned LLMaven Copilot Provider VSIX
+- verify the VSIX SHA256 against the value committed in this repository
+- install the provider extension if it is missing
+- configure the provider extension to use the LLMaven / LiteLLM gateway
 
-- Is the environment easy to understand?
-- Are the plugin-assisted suggestions useful?
-- Does the setup feel ready-to-go?
-- Are there any obvious points of confusion?
+You may see setup output in the terminal during first launch.
 
-## Environment management
+## 2. Understand the sandbox layout
 
-This Codespaces environment uses pixi for package and environment management.
+The sandbox has three main pieces:
 
-To verify the gateway connection, run:
+```text
+GitHub Codespaces
+  → provides the reproducible development environment
 
-```bash
-pixi run gateway-check
+LLMaven Copilot Provider
+  → routes Copilot Chat model requests through the LLMaven / LiteLLM gateway
+
+RSE Agent Plugins
+  → provide RSE-specific skills, agents, and workflows inside Copilot Chat
 ```
 
-If you need troubleshooting output, run:
+See the [three-layer sandbox view](assets/sandbox-three-layer-view.png), which shows the RSE Agent Plugins list, the LLMaven Copilot Provider extension, and the Copilot Chat model picker in one VS Code workspace.
 
-```bash
-pixi run gateway-check --debug
+![Three-layer sandbox view showing RSE Agent Plugins, the LLMaven Copilot Provider, and Copilot Chat](assets/sandbox-three-layer-view.png)
+
+In this view:
+
+- the left panel shows recommended RSE Agent Plugins
+- the center panel shows the installed LLMaven Copilot Provider extension
+- the right panel shows Copilot Chat with OAI-compatible models available through the provider
+
+## 3. Confirm the LLMaven Copilot Provider is installed
+
+Open the Extensions view and search for:
+
+```text
+LLMaven Copilot Provider
 ```
 
-## Running sample scripts
+You should see the extension installed.
 
-This sandbox uses pixi for environment management. Run sample scripts through pixi:
+See the [LLMaven Copilot Provider screenshot](assets/llmaven-copilot-provider.png).
 
-```bash
-pixi run python samples/climate_model.py
-pixi run python samples/climate_data_analysis.py
-pixi run python samples/model_visualization.py
+![LLMaven Copilot Provider extension page in VS Code](assets/llmaven-copilot-provider.png)
+
+This extension is the gateway-routing layer. It lets Copilot Chat use OAI-compatible model providers through the LLMaven / LiteLLM gateway.
+
+## 4. Confirm Copilot Chat can use an OAI-compatible model
+
+Open Copilot Chat.
+
+In the model picker, OAI-compatible models should appear alongside other available models.
+
+See the [Copilot model picker screenshot](assets/copilot-model-picker.png).
+
+![Copilot Chat model picker showing OAI-compatible models](assets/copilot-model-picker.png)
+
+Select one of the OAI-compatible models when you want requests to route through the LLMaven Copilot Provider.
+
+If startup shows the following warning, the provider extension may not be able to authenticate with the gateway:
+
+```text
+Warning: OAI_API_KEY is not set.
 ```
 
-## How credentials are provided
+If you see that warning, recreate the Codespace from the authorized onboarding flow.
 
-This repository declares the names of the required runtime secrets in devcontainer.json (LITELLM_BASE_URL and LITELLM_API_KEY).
+## 5. Install the recommended RSE Agent Plugins
 
-### Current implementation
-The actual secret values are not stored in the repository. They are provided through GitHub Codespaces development environment secrets (user-level, repository-level, or organization-level).
+Open the Extensions view and search:
 
-When a codespace is created, GitHub can prompt for any recommended secrets that are missing. Once configured, those secrets are injected into the codespace as environment variables and are available to lifecycle scripts, terminals, and compatible extensions.
+```text
+@agentPlugins @recommended
+```
 
-### How this evolves later
+You should see the UW SSEC RSE plugins recommended from the `rse-plugins` marketplace.
 
-As onboarding/provisioning becomes more complete, the goal is to preserve the same runtime contract (LITELLM_BASE_URL and LITELLM_API_KEY) while reducing manual setup for users. The sandbox should continue reading the same environment variables even if the delivery mechanism becomes more automated later.
+See the [recommended RSE Agent Plugins screenshot](assets/recommended-rse-agent-plugins.png).
 
-### Extension trust model
+![Recommended RSE Agent Plugins in VS Code](assets/recommended-rse-agent-plugins.png)
 
-This sandbox installs a minimal extension set. One third-party extension is currently required for OpenAI-compatible routing and should be treated as a deliberate trust assumption for the demo.
+Install the UW SSEC RSE plugins you want to use. Do not install plugins from unknown marketplaces in this sandbox unless instructed by the demo maintainers.
 
-## Notes
+Recommended plugins may include:
 
-If the LiteLLM gateway or related configuration is not available in your environment yet, some AI-assisted functionality may be limited.
+- `scientific-domain-applications`
+- `scientific-python-development`
+- `holoviz-visualization`
+- `ai-research-workflows`
+- `project-management`
+- `zarr-data-format`
+- `research-software-design`
+
+The exact set of recommended plugins may change as the marketplace evolves.
+
+## 6. Try an RSE workflow in Copilot Chat
+
+After installing the plugins, open Copilot Chat and try prompts such as:
+
+```text
+Use the scientific-python-development plugin to review this repository for testing, dependency, and API design issues.
+```
+
+```text
+Use the project-management plugin to assess onboarding and handoff readiness for this repository.
+```
+
+```text
+Use the research-software-design plugin to identify user, workflow, and design risks in this project.
+```
+
+```text
+Use the ai-research-workflows plugin to help structure this task into research, planning, experimentation, and implementation phases.
+```
+
+Depending on the installed plugin, you may see plugin-provided skills, agents, slash commands, or tools in Copilot Chat.
+
+## 7. Saving work
+
+This repository is intended as a managed sandbox. Demo users should fork the repository if they want to preserve changes.
+
+See:
+
+```text
+docs/save-your-work.md
+```
+
+## 8. Data and evaluation notes
+
+AI interactions may be routed through the LLMaven / LiteLLM gateway for research and evaluation purposes.
+
+See:
+
+```text
+docs/data-collection.md
+```
+
+## Troubleshooting
+
+### The LLMaven Copilot Provider extension is missing
+
+Reattach to the Codespace or reload the VS Code window.
+
+If the extension still does not appear, recreate the Codespace from the authorized onboarding flow.
+
+### `OAI_API_KEY` is missing
+
+If startup shows:
+
+```text
+Warning: OAI_API_KEY is not set.
+```
+
+the provider extension may not be able to authenticate with the gateway. Recreate the Codespace from the authorized onboarding flow.
+
+### RSE plugins do not appear
+
+Check that Agent Plugins are enabled in VS Code settings:
+
+```json
+"chat.plugins.enabled": true
+```
+
+Then open the Extensions view and search:
+
+```text
+@agentPlugins @recommended
+```
+
+### Copilot Chat works, but RSE-specific behavior is missing
+
+The provider extension and the RSE Agent Plugins are separate layers:
+
+```text
+LLMaven Copilot Provider = model routing
+RSE Agent Plugins = RSE workflows
+```
+
+If Copilot Chat works but RSE-specific skills, agents, or commands are missing, check whether the RSE Agent Plugins are installed and enabled.

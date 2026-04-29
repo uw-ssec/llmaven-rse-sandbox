@@ -13,6 +13,7 @@
         "ms-python.vscode-pylance"
       ],
       "settings": {
+        "chat.plugins.enabled": true,
         "oaicopilot.baseUrl": "https://uw-ssec-llmaven.hf.space",
         "workbench.startupEditor": "readme",
         "files.watcherExclude": {

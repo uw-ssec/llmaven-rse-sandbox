@@ -2,31 +2,67 @@
 
 This repository contains the sandbox environment for the NAIRR RSE Plugins Demo.
 
-It is a preconfigured GitHub Codespaces workspace where authorized users can explore and evaluate Research Software Engineering (RSE) AI plugins using GitHub Copilot, with model requests routed through the LLMaven AI gateway.
+It provides a preconfigured GitHub Codespaces workspace where authorized users can evaluate Research Software Engineering (RSE) AI workflows using GitHub Copilot Chat, the LLMaven Copilot Provider extension, and the UW SSEC RSE Agent Plugins.
 
-## What this repo is
+## What this repo provides
 
-- A user-facing evaluation environment
-- A prebuilt Codespace with Copilot-compatible AI tooling, sample scientific code, and guided docs
-- A read-only source repository for demo users
+- A user-facing evaluation environment for RSE AI workflows
+- A GitHub Codespaces sandbox with scientific Python tooling managed by Pixi
+- A pinned LLMaven Copilot Provider extension for routing Copilot-compatible requests through the LLMaven / LiteLLM gateway
+- Workspace recommendations for UW SSEC RSE Agent Plugins
+- Guided documentation for first-time demo users
 
-## How it fits into the system
+## How the pieces fit together
 
-1. Users authenticate and register through the onboarding app
-2. They are granted read-only access to this repository
-3. They open a Codespace from this repo
-4. They use the sandbox to try plugin-assisted workflows
+The sandbox uses three layers:
+
+```text
+GitHub Codespaces
+  → provides the reproducible development environment
+
+LLMaven Copilot Provider
+  → routes Copilot Chat model requests through the LLMaven / LiteLLM gateway
+
+RSE Agent Plugins
+  → provide RSE-specific skills, agents, and workflows inside Copilot Chat
+```
+
+See the [three-layer sandbox view](docs/assets/sandbox-three-layer-view.png), which shows the RSE Agent Plugins list, the LLMaven Copilot Provider extension, and the Copilot Chat model picker in one VS Code workspace.
+
+![Three-layer sandbox view showing RSE Agent Plugins, the LLMaven Copilot Provider, and Copilot Chat](docs/assets/sandbox-three-layer-view.png)
+
+The Copilot provider extension and the RSE Agent Plugins are separate. The provider handles model routing. The plugins provide the research software engineering capabilities.
 
 ## Start here
 
-Open this repo in GitHub Codespaces, then open `docs/getting-started.md`.
+Open this repository in GitHub Codespaces, then follow:
+
+```text
+docs/getting-started.md
+```
 
 ## Saving your work
 
-Demo users should fork this repository to save work. See `docs/save-your-work.md`.
+This repository is intended as a managed sandbox. Demo users should fork this repository if they want to preserve changes outside the provided environment.
 
-## Notes
+See:
 
-AI interactions in this environment may be routed through the LLMaven gateway for research and evaluation purposes. See `docs/data-collection.md`.
+```text
+docs/save-your-work.md
+```
 
-This sandbox auto-installs a minimal extension set. One third-party extension is currently required for OpenAI-compatible routing and should be treated as a deliberate trust assumption for the demo.
+## Data and evaluation notes
+
+AI interactions in this environment may be routed through the LLMaven / LiteLLM gateway for research and evaluation purposes.
+
+See:
+
+```text
+docs/data-collection.md
+```
+
+## Trust assumptions
+
+This sandbox installs a pinned LLMaven Copilot Provider VSIX during devcontainer setup. The VSIX is verified against a SHA256 value committed in this repository before installation.
+
+The provider extension uses a gateway credential provisioned through the authorized onboarding flow. Use this sandbox only from trusted Codespace sessions created through that flow.
