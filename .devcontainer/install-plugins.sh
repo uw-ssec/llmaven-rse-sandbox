@@ -15,7 +15,7 @@ if ! command -v copilot >/dev/null 2>&1; then
 fi
 
 if ! command -v copilot >/dev/null 2>&1; then
-  error "copilot CLI still not found after install attempt"
+  error "copilot CLI not found after install attempt"
   exit 1
 fi
 
