@@ -9,14 +9,9 @@ error() {
   echo "[install-plugins] ERROR: $*" >&2
 }
 
-if ! command -v npm >/dev/null 2>&1; then
-  error "npm not found on PATH; cannot install copilot CLI"
-  exit 1
-fi
-
 if ! command -v copilot >/dev/null 2>&1; then
   log "Installing GitHub Copilot CLI..."
-  npm install -g @github/copilot
+  curl -fsSL https://gh.io/copilot-install | bash
 fi
 
 if ! command -v copilot >/dev/null 2>&1; then
