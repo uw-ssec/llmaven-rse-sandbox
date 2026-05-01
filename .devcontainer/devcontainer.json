@@ -21,9 +21,6 @@
           "**/.git/subtree-cache/**": true,
           "**/node_modules/**": true,
           "**/.pixi/**": true
-        },
-        "chat.pluginLocations": {
-            "/home/vscode/.copilot/installed-plugins/rse-plugins/ai-research-workflows": true
         }
       }
     }
