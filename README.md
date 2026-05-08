@@ -46,7 +46,7 @@ During first launch, the devcontainer automatically:
 - prepares the Pixi Python environment
 - downloads and verifies the pinned LLMaven Copilot Provider VSIX
 - installs the provider extension and configures it to route through the LLMaven / LiteLLM gateway
-- installs the Copilot CLI with the RSE plugin marketplace registered
+- installs the Copilot CLI, wires it to the LLMaven gateway, and registers the RSE plugin marketplace
 
 You will see setup output in the terminal during first launch. Wait for it to complete before continuing.
 
@@ -78,7 +78,7 @@ See the [Copilot model picker screenshot](docs/assets/copilot-model-picker.png).
 
 1. Open the Extensions view and search for `LLMaven Copilot Provider`. Confirm it is installed and enabled.
 2. Check the VS Code Output panel for any activation errors from the provider extension.
-3. If startup logged `Warning: OAI_API_KEY is not set`, the gateway credential is missing — recreate the Codespace from the authorized onboarding flow.
+3. If startup logged `Warning: OAI_API_KEY is not set`, the `LITELLM_API_KEY` Codespace secret was missing or not set before the Codespace was created — recreate the Codespace from the authorized onboarding flow.
 4. If the extension is installed but models still do not appear, try reloading the VS Code window (`Ctrl+Shift+P` → **Developer: Reload Window**) and reopening the model picker.
 5. If the issue persists, open a new Codespace from the onboarding flow rather than reconnecting to an existing one.
 
@@ -140,7 +140,21 @@ Once the Chat interaction is working, use the Copilot CLI for workflows that ben
 - Piping Copilot output into other shell tools
 - Running plugin-backed tasks non-interactively in a script or CI context
 
-The Copilot CLI is installed in the devcontainer and the RSE plugin marketplace is pre-registered. Run `gh copilot --help` to see available commands and `gh copilot suggest` or `gh copilot explain` for common entry points.
+The Copilot CLI is installed in the devcontainer, pre-wired to the LLMaven gateway, and the RSE plugin marketplace is registered. The default model is `gpt-5.3-codex`.
+
+Start a chat session from the terminal:
+
+```text
+gh copilot chat
+```
+
+Switch models in-session using the `/model` slash command:
+
+```text
+/model gpt-5.4-mini
+/model gpt-5.4-pro
+/model gpt-oss-120b
+```
 
 For the full setup details and troubleshooting, see [docs/getting-started.md](docs/getting-started.md).
 
