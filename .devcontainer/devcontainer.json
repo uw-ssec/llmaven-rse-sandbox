@@ -10,7 +10,7 @@
         "ms-python.vscode-pylance"
       ],
       "settings": {
-        "chat.plugins.enabled": true,
+        "chat.plugins.enabled": false,
         "python.defaultInterpreterPath": "${containerWorkspaceFolder}/.pixi/envs/default/bin/python",
         "python.useEnvironmentsExtension": false,
         "oaicopilot.baseUrl": "${localEnv:LITELLM_BASE_URL}/v1",
