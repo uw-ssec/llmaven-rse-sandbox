@@ -138,10 +138,37 @@ verify_sha256() {
   fi
 }
 
+find_code() {
+  # The /usr/local/bin/code shim that ships with mcr.microsoft.com/devcontainers/base
+  # only works when ~/.vscode-server/bin/*/bin/remote-cli is also in PATH AFTER the
+  # shim, which is not guaranteed for non-interactive postAttachCommand shells.
+  # Resolve the VS Code Server remote-cli `code` directly to avoid that fragility.
+  local candidate
+  for candidate in "${HOME}"/.vscode-server/bin/*/bin/remote-cli/code; do
+    if [ -x "${candidate}" ]; then
+      printf '%s\n' "${candidate}"
+      return 0
+    fi
+  done
+
+  # Fall back to whatever `code` is on PATH (the shim or a real install).
+  if command -v code >/dev/null 2>&1; then
+    command -v code
+    return 0
+  fi
+
+  return 1
+}
+
 main_install() {
   log "Checking OAI-compatible Copilot extension..."
 
-  require_cmd code || return 1
+  if ! CODE_BIN="$(find_code)"; then
+    error "VS Code CLI not found. Looked in ~/.vscode-server/bin/*/bin/remote-cli/code and PATH."
+    return 1
+  fi
+  log "Using VS Code CLI: ${CODE_BIN}"
+
   require_cmd grep || return 1
   require_cmd realpath || return 1
   require_cmd sha256sum || return 1
@@ -162,15 +189,15 @@ main_install() {
   log "Verifying VSIX SHA256 before install..."
   verify_sha256 || return 1
 
-  if code --list-extensions | grep -qx "${EXTENSION_ID}"; then
+  if "${CODE_BIN}" --list-extensions | grep -qx "${EXTENSION_ID}"; then
     log "Extension already installed: ${EXTENSION_ID}"
     return 0
   fi
 
   log "Installing extension from verified VSIX: ${VSIX_PATH}"
-  code --install-extension "${VSIX_PATH}"
+  "${CODE_BIN}" --install-extension "${VSIX_PATH}"
 
-  if ! code --list-extensions | grep -qx "${EXTENSION_ID}"; then
+  if ! "${CODE_BIN}" --list-extensions | grep -qx "${EXTENSION_ID}"; then
     error "extension was not installed: ${EXTENSION_ID}"
     return 1
   fi
