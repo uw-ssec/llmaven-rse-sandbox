@@ -27,26 +27,6 @@
               }
           },
           {
-              "id": "gpt-5.4-pro",
-              "displayName": "GPT 5.4 Pro (UW SSEC)",
-              "owned_by": "uw-ssec",
-              "temperature": 1,
-              "isUserSelectable": true,
-              "extra": {
-                  "allowed_openai_params": ["top_p"]
-              }
-          },
-          {
-              "id": "gpt-5.3-codex",
-              "displayName": "GPT 5.3 Codex (UW SSEC)",
-              "owned_by": "uw-ssec",
-              "temperature": 1,
-              "isUserSelectable": true,
-              "extra": {
-                  "allowed_openai_params": ["top_p"]
-              }
-          },
-          {
               "id": "gpt-oss-120b",
               "displayName": "GPT OSS 120B (UW SSEC)",
               "owned_by": "uw-ssec",
