@@ -140,15 +140,19 @@ Other commands provided by the plugin: `/experiment`, `/handoff`, `/implement`, 
 
 ## Saving your work
 
-This repository is intended as a managed sandbox. Demo users should fork this repository if they want to preserve changes outside the provided environment.
+This repository is a managed sandbox with restricted write access. To preserve your work outside the provided environment:
 
-See [docs/save-your-work.md](docs/save-your-work.md).
+1. Fork this repository to your own GitHub account
+2. Add your fork as a remote if needed
+3. Commit and push your changes to your fork
+
+This keeps the shared sandbox source clean while letting you preserve your own work.
+
+**Heads-up — forking does not carry gateway access.** The LLMoxie / LiteLLM gateway credentials are provisioned for this sandbox specifically and are not part of the repository contents. A GitHub Codespace launched from your own fork will not have those credentials, so Copilot Chat and the Copilot CLI in that Codespace will not be able to route requests through the UW SSEC models. Use the sandbox Codespace for AI-routed workflows; use your fork to preserve code changes.
 
 ## Data and evaluation notes
 
-AI interactions in this environment may be routed through the LLMoxie / LiteLLM gateway for research and evaluation purposes.
-
-See [docs/data-collection.md](docs/data-collection.md).
+AI interactions in this environment may be routed through the LLMoxie / LiteLLM gateway for research and evaluation purposes. The intended design is to support de-identified logging using session-level identifiers rather than personal identity.
 
 ## Trust assumptions
 
