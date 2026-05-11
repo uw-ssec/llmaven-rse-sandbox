@@ -33,6 +33,16 @@ RSE Agent Plugins
 
 The Copilot provider extension and the RSE Agent Plugins are separate. The provider handles model routing. The plugins provide the research software engineering capabilities.
 
+## Cost & resource limits
+
+Codespaces launched from this repository are configured with minimum viable resource specifications:
+
+- **Machine type:** 2-core CPU, 8 GB RAM, 32 GB storage (the most cost-efficient option for this workload)
+- **Idle timeout:** 30 minutes (configure at the organization level; idle Codespaces automatically stop after this period to prevent unexpected costs)
+- **Spending limits:** Organization administrators should configure Codespace spending limits as a safeguard, especially during high-concurrency events
+
+These defaults are designed to keep costs predictable for demo and workshop scenarios.
+
 ## Sandbox walkthrough
 
 Follow these steps to go from opening the sandbox to your first successful RSE workflow interaction.
