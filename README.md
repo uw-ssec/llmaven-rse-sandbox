@@ -142,21 +142,13 @@ Other commands provided by the plugin: `/experiment`, `/handoff`, `/implement`, 
 
 This repository is intended as a managed sandbox. Demo users should fork this repository if they want to preserve changes outside the provided environment.
 
-See:
-
-```text
-docs/save-your-work.md
-```
+See [docs/save-your-work.md](docs/save-your-work.md).
 
 ## Data and evaluation notes
 
 AI interactions in this environment may be routed through the LLMoxie / LiteLLM gateway for research and evaluation purposes.
 
-See:
-
-```text
-docs/data-collection.md
-```
+See [docs/data-collection.md](docs/data-collection.md).
 
 ## Trust assumptions
 
