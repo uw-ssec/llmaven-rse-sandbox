@@ -1,5 +1,7 @@
 # LLMoxie NAIRR Sandbox
 
+[![Part of NAIRR Pilot](https://img.shields.io/badge/Part_of-NAIRR_Pilot-0d4f8c?style=for-the-badge)](https://nairrpilot.org/) [![NAIRR Pilot award NAIRR240292](https://img.shields.io/badge/Award-NAIRR240292-0d4f8c?style=for-the-badge)](https://nairrpilot.org/projects/awarded?_requestNumber=NAIRR240292) [![Start the Sandbox walkthrough](https://img.shields.io/badge/Start-Sandbox%20walkthrough-2ea44f?style=for-the-badge)](#sandbox-walkthrough)
+
 This repository is a **NAIRR Pilot Sandbox** for exploring AI-assisted Research Software Engineering (RSE) workflows.
 
 NAIRR Pilot Sandbox projects are for any US-based researcher, educator, or student interested in exploring an AI-related example project in a test environment. These Sandboxes are isolated environments for experimentation and development. They allow academics, scientists, and students to try out new features or server configurations, or just play with AI tools without impacting the live system. Think of a sandbox as a playground where you can experiment with different AI tools and ideas without breaking anything that's already working.
